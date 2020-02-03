@@ -63,5 +63,22 @@ dataloader = torch.utils.data.DataLoader(FaceDataset,
                                      num_workers=8 # 多进程
                                      )
 
+G = cGAN_Model.CNN_Generator(z_dimension,32,15*192*192)
+D = cGAN_Model.CNN_Discriminator(32)
+
+if torch.cuda.is_available():
+    D = D.cuda()
+    G = G.cuda()
+
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+# Binary cross entropy loss and optimizer
+criterion = nn.BCELoss()
+d_optimizer = torch.optim.Adam(D.parameters(), lr=0.0002)
+g_optimizer = torch.optim.Adam(G.parameters(), lr=0.0002)
+
+
+
+
 
 
