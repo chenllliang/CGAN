@@ -10,10 +10,9 @@ from torch.autograd import Variable
 import os
 import cGAN_Model
 from Onehot_embedding import Voc
+import yaml
 
-#导入经过处理的label原始信息
-f=open("train_tag_dict.txt","r")
-data =eval(f.read())
+
 
 #展示前5条
 for i in range(5):
@@ -29,11 +28,11 @@ voc.trim(100)
 
 
 
-def to_img(x):
-    out = 0.5 * (x + 1)
-    out = out.clamp(0, 1)
-    out = x.view(-1, 3, 96, 96)
-    return out
+# def to_img(x):
+#     out = 0.5 * (x + 1)
+#     out = out.clamp(0, 1)
+#     out = x.view(-1, 3, 96, 96)
+#     return out
 
 
 img_transform = transforms.Compose([

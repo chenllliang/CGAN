@@ -76,7 +76,7 @@ class Voc:
 
         return hair, eyes
 
-    def generate_d_vectors(self, hair, eyes):
+    def generate_2_vectors(self, hair, eyes):
         h_vector = np.zeros(self.num_words)
         e_vector = np.zeros(self.num_words)
 
@@ -87,6 +87,12 @@ class Voc:
 
         return h_vector, e_vector
 
+    def generate_final_vector(self,description):
+        hair,eyes = self.split_description(description)
+        h_vector,e_vector = self.generate_2_vectors(hair,eyes)
+        return np.concatenate((h_vector,e_vector),axis=0)
+
+
 
 voc = Voc("d_vector")
 for key in data:
@@ -96,10 +102,11 @@ voc.trim(100)
 import os
 #删除未知标签的文件
 
-required_img = list(data.keys())
+def delete_imgs(data):
+    required_img = list(data.keys())
 
-for i in range(33430):
-    i=i+1
-    if i not in required_img:
-        path = r"./faces/"+str(i)+".jpg"
-        os.remove(path)
+    for i in range(33430):
+        i=i+1
+        if i not in required_img:
+            path = r"./faces/"+str(i)+".jpg"
+            os.remove(path)
