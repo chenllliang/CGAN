@@ -63,8 +63,9 @@ class CNN_Discriminator(nn.Module):
         x: batch, width, height, channel=3
 
         '''
-        label = self.label_embedding(label).view(1,96,96)
-        x = torch.cat([x,label],0)
+        label = self.label_embedding(label).view(-1,1,96,96)
+        print(x.shape,label.shape)
+        x = torch.cat([x,label],1)
         x = self.conv1(x)
         x = self.conv2(x)
         x = x.view(x.size(0), -1)

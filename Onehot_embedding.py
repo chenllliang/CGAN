@@ -34,10 +34,12 @@ class Voc:
             return
         self.trimmed = True
         keep_words = []
-
+        abondon_words = []
         for k, v in self.word2count.items():
             if v >= min_count:
                 keep_words.append(k)
+            else:
+                abondon_words.append(k)
 
         print('keep_words {} / {} = {:.4f}'.format(len(keep_words), len(self.word2index),
                                                    len(keep_words) / len(self.word2index)))
@@ -49,6 +51,8 @@ class Voc:
 
         for word in keep_words:
             self.addWord(word)
+
+        return keep_words,abondon_words
 
     def split_description(self, sentence):
         q = sentence.split(" ")
@@ -97,7 +101,26 @@ class Voc:
 voc = Voc("d_vector")
 for key in data:
     voc.addSentence(data[key])
-voc.trim(100)
+
+keep_words,abondon_words=voc.trim(100)
+
+
+def set_cross(the_set,sentence):
+    for i in the_set:
+        if i in sentence:
+            return True
+    return False
+
+b_data=data.copy()
+
+for key in b_data:
+    if set_cross(abondon_words,b_data[key]):
+        del(data[key])
+
+
+
+
+
 
 import os
 #删除未知标签的文件
@@ -108,5 +131,10 @@ def delete_imgs(data):
     for i in range(33430):
         i=i+1
         if i not in required_img:
-            path = r"./faces/"+str(i)+".jpg"
+            path = r"./data/faces/"+str(i)+".jpg"
             os.remove(path)
+
+f=open("final_train_tag_dict.txt","w")
+f.write(str(data))
+f.close()
+
