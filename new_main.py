@@ -88,30 +88,7 @@ if torch.cuda.is_available():
 	D = D.cuda()
 	G = G.cuda()
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
-
-for i,[img,_] in enumerate(dataloader):
-	num_img = img.size(0)
-	img = img.view(num_img,3,96,96)
-	real_img = Variable(img).to(device)
-	real_label = Variable(torch.ones(num_img)).to(device)
-	fake_label = Variable(torch.zeros(num_img)).to(device)
-	batch_vectors = Variable(batch_vectors).to(device)
-	real_out = D(img,batch_vectors)
-
-	z = Variable(torch.randn(num_img, z_dimension)).to(device)
-	z = torch.cat((z,batch_vectors),axis=1).to(device)
-	fake_img = G(z)
-	fake_out = D(fake_img,batch_vectors)
-	
-
-	print(real_out,fake_out)
-	break
-
-
-
-
+device = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
 # Binary cross entropy loss and optimizer
 criterion = nn.BCELoss()
 d_optimizer = torch.optim.Adam(D.parameters(), lr=0.0002)
@@ -131,6 +108,8 @@ for epoch in range(num_epoch):
 			batch_vectors=torch.cat((label_vectors[i*batch_size:-1]),0)
 			batch_vectors=batch_vectors.view(-1,32).float()
 
+		if torch.cuda.is_available():
+			torch.cuda.empty_cache()
 
 		num_img = img.size(0)
 		#train discriminator
@@ -140,7 +119,7 @@ for epoch in range(num_epoch):
 		real_label = Variable(torch.ones(num_img)).to(device)
 		fake_label = Variable(torch.zeros(num_img)).to(device)
 		batch_vectors = Variable(batch_vectors).to(device)
-		matched_real_out = D(img,batch_vectors)
+		matched_real_out = D(real_img,batch_vectors)
 		d_loss_matched_real = criterion(matched_real_out, real_label)
 		matched_real_scores = matched_real_out  # closer to 1 means better
 
@@ -156,7 +135,7 @@ for epoch in range(num_epoch):
 
 		rand_label_vectors=random.sample(label_vectors,num_img)
 		rand_batch_vectors=torch.cat((rand_label_vectors[:]),0)
-		rand_batch_vectors=rand_batch_vectors.view(-1,32).float()
+		rand_batch_vectors=rand_batch_vectors.view(-1,32).float().to(device)
 
 
 		z = Variable(torch.randn(num_img, z_dimension)).to(device)
